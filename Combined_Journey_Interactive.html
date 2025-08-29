@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interactive Journey — High-Level → Creator → Brand</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f8fafc; --ink:#0f172a; --muted:#475569; --card:#ffffff;
+      --blue:#3b82f6; --green:#10b981; --amber:#f59e0b; --violet:#8b5cf6;
+      --shadow:0 6px 18px rgba(2,6,23,0.08);
+    }
+    html{font-size:16px;}
+    @media (min-width:480px){ html{font-size:17px;} }
+    @media (min-width:900px){ html{font-size:18px;} }
+
+    body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg); color:var(--ink); margin:0; padding:0;}
+
+    /* Top Nav */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background:linear-gradient(90deg, var(--blue), var(--green));
+      color:#fff; padding:10px 16px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .brand{font-weight:800; letter-spacing:.3px;}
+    .steps-nav{display:flex; gap:10px; flex-wrap:wrap;}
+    .step-pill{
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.25);
+      color:#fff; padding:6px 10px; border-radius:999px; cursor:pointer; font-size:.95rem;
+      display:flex; align-items:center; gap:6px; transition:transform .12s ease, background .2s ease;
+    }
+    .step-pill.active{background:#fff; color:#0f172a;}
+    .step-pill:hover{transform:translateY(-1px);}
+
+    /* Container */
+    .page{max-width:1100px; margin:0 auto; padding:22px 16px 32px;}
+    h1{margin:10px 0 8px; font-size:clamp(1.5rem, 3vw, 2.1rem); text-align:center;}
+    .subtitle{color:var(--muted); text-align:center; margin:0 0 20px;}
+
+    /* Sections */
+    section.view{display:none; animation:fade .25s ease;}
+    section.view.active{display:block;}
+    @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+    /* Cards / Boxes shared */
+    .grid-3{display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between;}
+    .box{flex:1 1 320px; background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:16px; text-align:center;}
+    .box h2{margin:.25rem 0 .5rem;}
+    .box p{margin:0; color:var(--muted); line-height:1.5;}
+    .creators{border-top:6px solid var(--blue);} .platform{border-top:6px solid var(--green);} .brands{border-top:6px solid var(--amber);}
+
+    .flow{margin:14px 0; text-align:center; color:#1f2937; font-weight:700;}
+    .callouts{display:flex; gap:14px; flex-wrap:wrap; margin-top:12px;}
+    .call{flex:1 1 320px; background:#eef2ff; padding:12px; border-radius:10px; box-shadow:0 3px 10px rgba(2,6,23,0.06);}
+
+    /* Persona header */
+    .persona{
+      display:grid; grid-template-columns:96px 1fr; gap:16px;
+      background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+      padding:16px; margin:0 auto 20px; align-items:center;
+    }
+    .avatar{width:96px; height:96px; border-radius:12px; background:linear-gradient(135deg,#dbeafe,#dcfce7);
+      display:flex; align-items:center; justify-content:center; font-size:2rem;}
+    .pill{background:#eef2ff; border-radius:999px; padding:.25rem .6rem; font-size:.85rem; margin-right:6px;}
+    .p-row{display:flex; flex-wrap:wrap; gap:8px;}
+
+    /* Steps list (Creator/Brand) */
+    .steps{display:flex; flex-direction:column; gap:14px;}
+    .step{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:16px; display:grid; grid-template-columns:52px 1fr; gap:14px; border-left:6px solid transparent;}
+    .ico{font-size:1.8rem; display:flex; align-items:center; justify-content:center;}
+    .step h3{margin:.1rem 0 .4rem; font-size:1.1rem;}
+    .step p{margin:0; color:var(--muted); line-height:1.5;}
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:.5rem;}
+    .chip{background:#f1f5f9; border-radius:999px; padding:.25rem .6rem; font-size:.8rem;}
+    .s1{border-left-color:var(--blue);} .s2{border-left-color:var(--green);} .s3{border-left-color:var(--amber);} .s4{border-left-color:var(--violet);}
+    .hint{font-size:.95rem; color:#0f766e; background:#ecfeff; border-radius:10px; padding:10px; margin-top:8px;}
+
+    /* Sidebar */
+    .journey{display:grid; grid-template-columns: 1.2fr .8fr; gap:20px; align-items:start;}
+    @media (max-width:900px){.journey{grid-template-columns:1fr;}}
+    .side{display:flex; flex-direction:column; gap:14px;}
+    .card{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:14px;}
+    .card h4{margin:.1rem 0 .4rem;}
+
+    details{background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:10px;}
+    summary{cursor:pointer; font-weight:600;}
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:0.95rem; color:#0f172a;
+      white-space: pre;   /* no wrapping */
+      overflow-x: auto;   /* horizontal scroll */
+      display:block; background:#f1f5f9; padding:12px; border-radius:8px; max-width:100%;
+    }
+
+    /* Banner CTA and Nav buttons */
+    .banner{margin-top:18px; background:linear-gradient(90deg, var(--green), var(--blue), var(--amber));
+      color:#fff; padding:14px; border-radius:12px; font-weight:700; text-align:center;}
+    .navbtns{display:flex; gap:10px; justify-content:center; margin-top:16px;}
+    .btn{
+      background:#0ea5e9; color:#fff; border:none; padding:10px 14px; border-radius:10px;
+      cursor:pointer; font-weight:700; box-shadow:0 4px 12px rgba(2,6,23,0.12); transition:transform .12s ease, background .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); background:#0284c7;}
+    .btn.alt{background:#10b981;} .btn.alt:hover{background:#059669;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Creator ↔ Brand Insight Bridge</div>
+    <div class="steps-nav">
+      <div class="step-pill active" data-target="highlevel">1 • High-Level</div>
+      <div class="step-pill" data-target="creator">2 • Creator (Maya)</div>
+      <div class="step-pill" data-target="brand">3 • Brand (Rachel)</div>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- HIGH-LEVEL VIEW -->
+    <section id="highlevel" class="view active">
+      <h1>Turning Creator Content Into Consumer Insights</h1>
+      <p class="subtitle">A simple bridge: creators upload content, our platform turns it into structured insights, brands act on it — and revenue flows back to creators through profit-sharing.</p>
+
+      <div class="grid-3">
+        <div class="box creators">
+          <h2>🎥 Creators</h2>
+          <p>Upload videos or podcasts. We make it easy and fast.</p>
+          <p style="font-style:italic; margin-top:.4rem;">“Make money from the insights in your videos.”</p>
+        </div>
+        <div class="box platform">
+          <h2>🔗 Platform</h2>
+          <p>We convert speech and visuals into structured, useful data. Consent-first marketplace.</p>
+          <p style="font-style:italic; margin-top:.4rem;">“Unstructured content becomes actionable data.”</p>
+        </div>
+        <div class="box brands">
+          <h2>📊 Brands</h2>
+          <p>Use real-time dashboards or download files to guide features, campaigns, and pricing.</p>
+          <p style="font-style:italic; margin-top:.4rem;">“Insights → Features → Revenue.”</p>
+        </div>
+      </div>
+
+      <div class="flow">Consumer Data Flow ➜ Creators → Platform → Brands</div>
+      <div class="flow">💵 Revenue flows back to Creators through profit-sharing</div>
+
+      <div class="callouts">
+        <div class="call">💬 Example insight: 67% of Gen Z women cite safety as the top reason for preferring Bumble over Tinder.</div>
+        <div class="call">📈 Market context: Global market research is approximately $150 billion. Brands already invest heavily in consumer insights.</div>
+      </div>
+
+      <div class="banner">Clear value on both sides — easier monetization for creators, faster decisions for brands</div>
+      <div class="navbtns">
+        <button class="btn alt" onclick="goto('creator')">Start with the Creator journey →</button>
+      </div>
+    </section>
+
+    <!-- CREATOR VIEW (Maya Lopez, Relationship Advice) -->
+    <section id="creator" class="view">
+      <h1>Maya’s Journey — From Content to Cash</h1>
+      <p class="subtitle">Persona: <strong>Maya Lopez</strong>, a relationship advice creator on YouTube and TikTok. She wants to earn more from the videos she is already making, without extra work.</p>
+
+      <section class="persona">
+        <div class="avatar">💬</div>
+        <div>
+          <h2 style="margin:0 0 .4rem;">Maya Lopez — Relationship Advice Creator</h2>
+          <div class="p-row">
+            <span class="pill">Wants: simple setup</span>
+            <span class="pill">Hates: admin overhead</span>
+            <span class="pill">Success: steady extra income</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="steps">
+        <div class="step s1">
+          <div class="ico">📤</div>
+          <div>
+            <h3>1) Upload your content</h3>
+            <p>Choose a video or podcast file, or paste a link. The system brings it in automatically.</p>
+            <div class="chips"><span class="chip">YouTube</span><span class="chip">TikTok</span><span class="chip">Podcast audio</span></div>
+          </div>
+        </div>
+        <div class="step s2">
+          <div class="ico">🤖</div>
+          <div>
+            <h3>2) We analyze everything</h3>
+            <p>Not just speech. We analyze visuals, voice tone, and patterns to produce higher‑value insights.</p>
+            <div class="chips"><span class="chip">Speech to text</span><span class="chip">Visual recognition</span><span class="chip">Emotion & sentiment</span><span class="chip">Audience signals</span></div>
+            <div class="hint">“Unstructured content becomes actionable data.”</div>
+          </div>
+        </div>
+        <div class="step s3">
+          <div class="ico">💵</div>
+          <div>
+            <h3>3) See your earnings preview</h3>
+            <p>For each piece of content, see a simple estimate of what brands would pay for the insights.</p>
+            <div class="chips"><span class="chip">Estimated value per video</span><span class="chip">Topics of interest</span></div>
+          </div>
+        </div>
+        <div class="step s4">
+          <div class="ico">🏦</div>
+          <div>
+            <h3>4) Get paid through profit‑sharing</h3>
+            <p>When brands purchase insights, money flows back to you. Withdraw to your bank account or payment app.</p>
+            <div class="chips"><span class="chip">Transparent payouts</span><span class="chip">Simple withdrawals</span></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="banner">Your content → Our analysis → Brand insights → Your revenue</div>
+      <div class="navbtns">
+        <button class="btn" onclick="goto('highlevel')">← Back to High-Level</button>
+        <button class="btn alt" onclick="goto('brand')">Next: Brand journey →</button>
+      </div>
+    </section>
+
+    <!-- BRAND VIEW (Rachel Kim, matched persona) -->
+    <section id="brand" class="view">
+      <h1>Rachel’s Journey — Turning Insights into Impact</h1>
+      <p class="subtitle">Persona: <strong>Rachel Kim</strong>, Consumer Insights Manager at a leading dating app (e.g., Bumble or Tinder). She wants faster, fresher signals to shape features and campaigns, and proof of revenue impact.</p>
+
+      <section class="persona">
+        <div class="avatar">👩‍💼</div>
+        <div>
+          <h2 style="margin:0 0 .4rem;">Rachel Kim — Consumer Insights Manager</h2>
+          <div class="p-row">
+            <span class="pill">Responsible for feature research and campaign briefs</span>
+            <span class="pill">Measures success: conversion, retention, customer satisfaction</span>
+            <span class="pill">Uses tools: data warehouses and dashboards</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="journey">
+        <div class="steps">
+          <div class="step s1">
+            <div class="ico">🔌</div>
+            <div>
+              <h3>1) Connect and ingest</h3>
+              <p>Connect through a secure data feed or download files in CSV or JSON format. Choose topics, segments, and refresh frequency (hourly or daily).</p>
+              <div class="chips"><span class="chip">CSV / JSON feeds</span><span class="chip">Secure sign‑in</span><span class="chip">Data pipelines</span></div>
+            </div>
+          </div>
+          <div class="step s2">
+            <div class="ico">📊</div>
+            <div>
+              <h3>2) Explore and identify</h3>
+              <p>Dashboards compare brands, surface trends, and filter by audience. Quickly see pain points (for example “safety”) and rising themes.</p>
+              <div class="chips"><span class="chip">Brand comparison</span><span class="chip">Trend lines</span><span class="chip">Audience filters</span></div>
+            </div>
+          </div>
+          <div class="step s3">
+            <div class="ico">🚀</div>
+            <div>
+              <h3>3) Act and launch</h3>
+              <p>Translate signals into action: prioritize new safety features, tailor messaging by age group, adjust pricing, and launch targeted campaigns.</p>
+              <div class="chips"><span class="chip">Feature roadmap</span><span class="chip">Personalized messaging</span><span class="chip">Ad targeting</span></div>
+            </div>
+          </div>
+          <div class="step s4">
+            <div class="ico">📈</div>
+            <div>
+              <h3>4) Measure and prove</h3>
+              <p>Track results: conversion, retention, customer satisfaction, cost to acquire a customer, and customer lifetime value. Feed improvements back into the loop.</p>
+              <div class="chips"><span class="chip">A/B tests</span><span class="chip">Customer acquisition cost</span><span class="chip">Lifetime value</span><span class="chip">Satisfaction scores</span></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="card">
+            <h4>Sample data object</h4>
+            <details>
+              <summary>JSON (click to toggle)</summary>
+              <code>{
+  "topic": "Dating App Safety",
+  "audience": {"age": "18-34", "gender": "female", "region": "US"},
+  "sentiment": {"positive": 0.72, "neutral": 0.18, "negative": 0.10},
+  "mentions": 3200,
+  "visual_signals": ["ID badge icons", "profile verification UI"],
+  "speech_signals": ["safety", "catfishing", "verification"],
+  "time_window": "2025-Q2",
+  "examples": [
+    "Bumble feels safer than Tinder",
+    "Hinge has better filters"
+  ]
+}</code>
+            </details>
+          </div>
+          <div class="card">
+            <h4>What this enables</h4>
+            <div class="call">• Prioritize safety features<br>• Write campaign briefs with real quotes<br>• Send audience signals to advertising platforms</div>
+          </div>
+          <div class="card">
+            <h4>Revenue impact</h4>
+            <div class="call">• Higher conversion with relevant features<br>• Better retention with experience fixes<br>• More efficient advertising spend</div>
+          </div>
+        </aside>
+      </section>
+
+      <div class="banner">Insights → Features → Campaigns → 📈 Revenue Growth</div>
+      <div class="navbtns">
+        <button class="btn" onclick="goto('creator')">← Back to Creator</button>
+        <button class="btn" onclick="goto('highlevel')">Back to High-Level</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const pills = document.querySelectorAll('.step-pill');
+    function setActive(targetId){
+      document.querySelectorAll('section.view').forEach(s => s.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+      pills.forEach(p => p.classList.remove('active'));
+      document.querySelector(`.step-pill[data-target="${targetId}"]`).classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function goto(targetId){ setActive(targetId); }
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => setActive(pill.dataset.target));
+    });
+  </script>
+</body>
+</html>
